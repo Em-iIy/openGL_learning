@@ -1,0 +1,23 @@
+vertices{
+	-1.0f, -1.0f, 1.0f,
+	1.0f, -1.0f, 1.0f,
+	-1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	-1.0f, 1.0f, -1.0f,
+	1.0f, 1.0f, -1.0f,
+	-1.0f, -1.0f, -1.0f,
+	1.0f, -1.0f, -1.0f
+}
+
+indices{
+	4, 5, 5, 6, 6, 4, // back bottom triangle
+	5, 6, 6, 7, 7, 5, // back top triangle
+	0, 4, 6, 0, // left top triangle
+	2, 4, 0, 4, // left bottom triangle
+	3, 4, // top
+	0, 7, // bottom
+	3, 7, 7, 1, // right bottom triangle
+	3, 5, 7, 3, // right top triangle
+	0, 1, 1, 2, 2, 0, // front bottom triangle
+	1, 2, 2, 3, 3, 1 // front top triangle
+}
