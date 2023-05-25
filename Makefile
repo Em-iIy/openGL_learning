@@ -28,7 +28,8 @@ OBJS = $(FILES_OBJS:%=$(DIR_OBJS)%)
 CC = c++
 # CFLAGS = -std=c++98
 CFLAGS += -Wall -Wextra -Werror
-LFLAGS += -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit
+# LFLAGS += -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit
+LFLAGS += -lglfw -ldl
 INC = -ILibraries/include
 
 # ----------------------------------------Making

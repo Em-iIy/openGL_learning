@@ -1,5 +1,6 @@
 #include<iostream>
-#include<math.h>
+#include <cmath>
+#include <cstring>
 #include<glad/glad.h>
 #include<GLFW/glfw3.h>
 
@@ -8,7 +9,7 @@
 #include"VBO.hpp"
 #include"EBO.hpp"
 
-
+#define DISTANCE 4
 
 // Vertices coordinates
 // GLfloat vertices[] =
@@ -28,11 +29,12 @@ GLfloat vertices[] = {
 	1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // bottom right front 	1
 	-1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // top left front 		2
 	1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // top right front 		3
-	-0.8f, 0.75f, -0.8f, 1.0f, 0.0f, 0.0f, // top left back 	4
-	0.8f, 0.75f, -0.8f, 1.0f, 0.0f, 0.0f, // top right back 	5
-	-0.8f, -0.75f, -0.8f, 1.0f, 0.0f, 0.0f, // bottom left back	6
-	0.8f, -0.75f, -0.8f, 1.0f, 0.0f, 0.0f // bottom right back	7
+	-1.00f, 1.00f, -1.00f, 0.0f, 1.0f, 0.0f, // top left back 		4
+	1.00f, 1.00f, -1.00f, 0.0f, 1.0f, 0.0f, // top right back 		5
+	-1.00f, -1.00f, -1.00f, 0.0f, 1.0f, 0.0f, // bottom left back	6
+	1.00f, -1.00f, -1.00f, 0.0f, 1.0f, 0.0f // bottom right back	7
 };
+GLfloat temp[sizeof(vertices)];
 GLfloat vertices2[] = {
 	-1.0f / 2, -1.0f / 2, 1.0f / 2, 1.0f, 1.0f, 0.0f, // bottom left front 	0
 	1.0f / 2, -1.0f / 2, 1.0f / 2, 1.0f, 1.0f, 0.0f, // bottom right front 	1
@@ -54,29 +56,32 @@ GLfloat vertices2[] = {
 
 // cube
 GLuint indices[] = {
-	4, 5, 5, 6, 6, 4, // back bottom triangle
-	5, 6, 6, 7, 7, 5, // back top triangle
-	0, 4, 6, 0, // left top triangle
-	2, 4, 0, 4, // left bottom triangle
-	3, 4, // top
-	0, 7, // bottom
-	3, 7, 7, 1, // right bottom triangle
-	3, 5, 7, 3, // right top triangle
-	0, 1, 1, 2, 2, 0, // front bottom triangle
-	1, 2, 2, 3, 3, 1 // front top triangle
+	4, 5, 6, 4, // back bottom triangle
+	6, 7, 7, 5, // back top triangle
+	6, 0, // left top triangle
+	2, 4, // left bottom triangle
+	7, 1, // right bottom triangle
+	3, 5, // right top triangle
+	0, 1, 2, 0, // front bottom triangle
+	2, 3, 3, 1 // front top triangle
 };
 
-// GLuint indices2[] = {
-// 	0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7,
-// 	1, 0, 1, 1, 1, 2, 1, 3, 1, 4, 1, 5, 1, 6, 1, 7,
-// 	2, 0, 2, 2, 2, 2, 2, 3, 2, 4, 2, 5, 2, 6, 2, 7,
-// 	3, 0, 3, 3, 3, 3, 3, 3, 3, 4, 3, 5, 3, 6, 3, 7,
-// 	4, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 4, 6, 4, 7,
-// 	5, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 5, 7,
-// 	6, 0, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7,
-// 	7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-// };
+GLuint indices2[] = {
+	0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7,
+	1, 0, 1, 1, 1, 2, 1, 3, 1, 4, 1, 5, 1, 6, 1, 7,
+	2, 0, 2, 2, 2, 2, 2, 3, 2, 4, 2, 5, 2, 6, 2, 7,
+	3, 0, 3, 3, 3, 3, 3, 3, 3, 4, 3, 5, 3, 6, 3, 7,
+	4, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 4, 6, 4, 7,
+	5, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 5, 7,
+	6, 0, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7,
+	7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+};
 
+void matmul(GLfloat matrix[3][3], GLfloat *in, GLfloat *out)
+{
+	for (uint i = 0; i < 3; ++i)
+		out[i] = in[i] * matrix[0][i] + in[i] * matrix[1][i] + in[i] * matrix[2][i];
+}
 
 int main()
 {
@@ -158,8 +163,49 @@ int main()
 
 
 	// Main while loop
+	float angle = 0.01f;
+	
+	std::memcpy(temp, vertices, sizeof(vertices));
 	while (!glfwWindowShouldClose(window))
 	{
+		GLfloat rotateY[3][3] = {
+			{cosf(angle), 0, sinf(angle)},
+			{0, 1, 0},
+			{-sinf(angle), 0, cosf(angle)}
+		};
+		// GLfloat rotateX[3][3] = {
+		// 	{1, 0, 0},
+		// 	{0, cosf(angle),-sinf(angle)},
+		// 	{0, sinf(angle), cosf(angle)}
+		// };
+		// GLfloat rotate[3][3] = {
+		// 	{1, 0, 0},
+		// 	{0, 1, 0},
+		// 	{0, 0, 1}
+		// };
+		// for (uint64_t i = 0; i < sizeof(vertices); i += 3)
+		// {
+		// 	matmul(rotateY, &vertices[i], &temp[i]);
+		// }
+		for (uint64_t i = 0; i < sizeof(vertices); i += 6)
+		{
+			matmul(rotateY, &vertices[i], &temp[i]);
+			GLfloat z = 1 / (DISTANCE - temp[i + 2]);
+			GLfloat projection[3][3] = {
+				{z, 0, 0},
+				{0, z, 0},
+				{0, 0, 0}
+			};
+			matmul(projection, &temp[i], &temp[i]);
+		}
+		// if (vertices[0] < -0.5f)
+		// 	angle = 0.01f;
+		// if (vertices[0] > 0.5f)
+		// 	angle = -0.01f;
+		// for (uint64_t i = 0; i < sizeof(vertices); ++i)
+		// 	vertices[i] += angle;
+
+		
 		// Specify the color of the background
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		// Clean the back buffer and assign the new color to it
@@ -168,16 +214,15 @@ int main()
 		shaderProgram.Activate();
 		// Bind the VAO so OpenGL knows to use it
 		VAO1.Bind();
+		VBO1.Update(temp, sizeof(temp));
 		// Draw primitives, number of indices, datatype of indices, index of indices
 		glDrawElements(GL_LINES, sizeof(indices), GL_UNSIGNED_INT, 0);
 		VAO1.Unbind();
-		// VAO2.Bind();
-		// glDrawElements(GL_LINES, sizeof(indices2), GL_UNSIGNED_INT, 0);
-		// VAO2.Unbind();
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
 		// Take care of all GLFW events
 		glfwPollEvents();
+		angle += 0.01f;
 	}
 
 
