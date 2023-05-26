@@ -25,14 +25,14 @@
 	// 0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f,
 	// 0.2f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f
 GLfloat vertices[] = {
-	-1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // bottom left front 	0
-	1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // bottom right front 	1
+	-1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, // bottom left front 	0
+	1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, // bottom right front 	1
 	-1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // top left front 		2
 	1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // top right front 		3
-	-1.00f, 1.00f, -1.00f, 0.0f, 1.0f, 0.0f, // top left back 		4
-	1.00f, 1.00f, -1.00f, 0.0f, 1.0f, 0.0f, // top right back 		5
-	-1.00f, -1.00f, -1.00f, 0.0f, 1.0f, 0.0f, // bottom left back	6
-	1.00f, -1.00f, -1.00f, 0.0f, 1.0f, 0.0f // bottom right back	7
+	-1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 1.0f, // top left back 		4
+	1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 1.0f, // top right back 		5
+	-1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, // bottom left back	6
+	1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f // bottom right back	7
 };
 GLfloat temp[sizeof(vertices)];
 GLfloat vertices2[] = {
@@ -79,8 +79,11 @@ GLuint indices2[] = {
 
 void matmul(GLfloat matrix[3][3], GLfloat *in, GLfloat *out)
 {
+	GLfloat temp[3];
 	for (uint i = 0; i < 3; ++i)
-		out[i] = in[i] * matrix[0][i] + in[i] * matrix[1][i] + in[i] * matrix[2][i];
+		temp[i] = in[0] * matrix[0][i] + in[1] * matrix[1][i] + in[2] * matrix[2][i];
+	for (uint i = 0; i < 3; ++i)
+		out[i] = temp[i];
 }
 
 int main()
@@ -104,7 +107,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #endif
 	// Create a GLFWwindow object of 800 by 800 pixels, naming it "YoutubeOpenGL"
-	GLFWwindow* window = glfwCreateWindow(800, 800, "cube", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(800, 600, "cube", NULL, NULL);
 	// Error check if the window fails to create
 	if (window == NULL)
 	{
@@ -114,12 +117,13 @@ int main()
 	}
 	// Introduce the window into the current context
 	glfwMakeContextCurrent(window);
-
+	int width, height;
+	glfwGetWindowSize(window, &width, &height);
 	//Load GLAD so it configures OpenGL
 	gladLoadGL();
 	// Specify the viewport of OpenGL in the Window
 	// In this case the viewport goes from x = 0, y = 0, to x = 800, y = 800
-	glViewport(0, 0, 800, 800);
+	glViewport(0, 0, width, height);
 
 
 	Shader shaderProgram("resources/shaders/default.vert", "resources/shaders/default.frag");
@@ -168,16 +172,23 @@ int main()
 	std::memcpy(temp, vertices, sizeof(vertices));
 	while (!glfwWindowShouldClose(window))
 	{
+		glfwGetWindowSize(window, &width, &height);
+		glViewport(0, 0, width, height);
 		GLfloat rotateY[3][3] = {
 			{cosf(angle), 0, sinf(angle)},
 			{0, 1, 0},
 			{-sinf(angle), 0, cosf(angle)}
 		};
-		// GLfloat rotateX[3][3] = {
-		// 	{1, 0, 0},
-		// 	{0, cosf(angle),-sinf(angle)},
-		// 	{0, sinf(angle), cosf(angle)}
-		// };
+		GLfloat rotateX[3][3] = {
+			{1, 0, 0},
+			{0, cosf(angle), -sinf(angle)},
+			{0, sinf(angle), cosf(angle)}
+		};
+		GLfloat rotateZ[3][3] = {
+			{cosf(angle),-sinf(angle), 0},
+			{sinf(angle), cosf(angle), 0},
+			{0, 0, 1}
+		};
 		// GLfloat rotate[3][3] = {
 		// 	{1, 0, 0},
 		// 	{0, 1, 0},
@@ -190,6 +201,8 @@ int main()
 		for (uint64_t i = 0; i < sizeof(vertices); i += 6)
 		{
 			matmul(rotateY, &vertices[i], &temp[i]);
+			matmul(rotateX, &temp[i], &temp[i]);
+			matmul(rotateZ, &temp[i], &temp[i]);
 			GLfloat z = 1 / (DISTANCE - temp[i + 2]);
 			GLfloat projection[3][3] = {
 				{z, 0, 0},
