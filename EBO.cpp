@@ -1,5 +1,10 @@
 #include"EBO.hpp"
 
+#include <iostream>
+
+EBO::EBO(void)
+{
+}
 // Constructor that generates a Elements Buffer Object and links it to indices
 EBO::EBO(GLuint* indices, GLsizeiptr size)
 {
