@@ -8,6 +8,12 @@
 #include "VAO.hpp"
 #include "readFile.hpp"
 
+enum {
+	CUBE_FRAME,
+	CUBE_MESH,
+	CUBE_TRIANGLE
+};
+
 class Cube
 {
 	private:
@@ -16,18 +22,23 @@ class Cube
 		EBO		_EBO;
 		GLfloat	_coords[3];
 		GLfloat	_size;
-		std::vector<GLfloat> _base_vertices;
-		std::vector<GLuint>	_base_indices;
-		GLfloat	*_vertices;
-		GLuint	*_indices;
-		void loadMesh(const char *filename);
+		GLfloat	*_draw_buffer;
+
 	public:
 		void	Delete(void);
-		Cube(void);
+		// Resets draw buffer to base vertices
+		void	Clear(void);
+		// Transforms draw buffer with passed matrix
+		void	Transform(GLfloat mat[3][3]);
+		// Draws the cube as a mesh
+		void	DrawMesh(GLfloat dist);
+		// Draws the cube as it's frame
+		void	DrawFrame(GLfloat dist);
+	
 		Cube(GLfloat coords[3], GLfloat size);
-		~Cube(void);
-		Cube(Cube const &src);
-		Cube	&operator=(Cube const &rhs);
+		~Cube();
+		// Cube(Cube const &src);
+		// Cube	&operator=(Cube const &rhs);
 };
 
 #endif
