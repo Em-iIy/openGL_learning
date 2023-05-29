@@ -15,10 +15,16 @@ class Cube
 		VBO		_VBO;
 		EBO		_EBO;
 		GLfloat	_coords[3];
-		
-
+		GLfloat	_size;
+		std::vector<GLfloat> _base_vertices;
+		std::vector<GLuint>	_base_indices;
+		GLfloat	*_vertices;
+		GLuint	*_indices;
+		void loadMesh(const char *filename);
 	public:
-		Cube(GLfloat x, GLfloat y, GLfloat z);
+		void	Delete(void);
+		Cube(void);
+		Cube(GLfloat coords[3], GLfloat size);
 		~Cube(void);
 		Cube(Cube const &src);
 		Cube	&operator=(Cube const &rhs);
