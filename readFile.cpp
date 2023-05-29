@@ -1,16 +1,20 @@
 #include <fstream>
+#include <sstream>
+#include <iostream>
 
-// Reads a text file and outputs a string with everything in the text file
-std::string readFile(const char* filename)
+std::string	readFile(const char *fileName)
 {
-	std::ifstream in(filename, std::ios::binary);
-	if (!in)
-		throw(std::runtime_error("Could not read file"));
-	std::string contents;
-	in.seekg(0, std::ios::end);
-	contents.resize(in.tellg());
-	in.seekg(0, std::ios::beg);
-	in.read(&contents[0], contents.size());
-	in.close();
-	return(contents);
+	std::ifstream file;
+	file.open(fileName);
+	if (!file.is_open())
+	{
+		std::cerr << "Error opening " << fileName << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	std::stringstream temp;
+	temp << file.rdbuf();
+	std::string str = temp.str();
+	file.close();
+	return (str);
 }
+
