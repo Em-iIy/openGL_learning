@@ -10,6 +10,7 @@ FILES_SRCS =	main.cpp \
 				glad.cpp \
 				readFile.cpp \
 				shaderClass.cpp \
+				window.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
 
@@ -29,7 +30,7 @@ OBJS = $(FILES_OBJS:%=$(DIR_OBJS)%)
 CC = c++
 # CFLAGS = -std=c++98
 CFLAGS += -Wall -Wextra -Werror
-CFLAGS += -g -fsanitize=address
+# CFLAGS += -g -fsanitize=address
 # LFLAGS += -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit
 LFLAGS += -lglfw -ldl
 INC = -ILibraries/include
