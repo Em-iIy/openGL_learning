@@ -1,7 +1,7 @@
 #ifndef WINDOW_HPP
 # define WINDOW_HPP
 
-#include <glad/glad.h>
+#include <GLAD/glad.h>
 #include <GLFW/glfw3.h>
 
 void	initGlfw(void);

@@ -1,6 +1,4 @@
-#include"EBO.hpp"
-
-#include <iostream>
+#include "EBO.hpp"
 
 EBO::EBO(void)
 {

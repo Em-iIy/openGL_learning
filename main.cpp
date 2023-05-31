@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include <cstring>
-#include <glad/glad.h>
+#include <GLAD/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm/glm.hpp>
 #include "shaderClass.hpp"

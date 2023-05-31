@@ -33,7 +33,7 @@ CC = c++
 # CFLAGS += -g -fsanitize=address
 LFLAGS += -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit # Apple flags
 # LFLAGS += -lglfw -ldl # Linux flags
-INC = -Iinclude
+INC = -Iinc
 
 # ----------------------------------------Making
 all:

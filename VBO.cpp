@@ -1,4 +1,4 @@
-#include"VBO.hpp"
+#include "VBO.hpp"
 
 #include <iostream>
 

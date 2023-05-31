@@ -1,7 +1,7 @@
 #ifndef CUBE_HPP
 # define CUBE_HPP
 
-#include <glad/glad.h>
+#include <GLAD/glad.h>
 #include <vector>
 #include "VBO.hpp"
 #include "EBO.hpp"

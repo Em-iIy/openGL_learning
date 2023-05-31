@@ -1,4 +1,4 @@
-#include"shaderClass.hpp"
+#include "shaderClass.hpp"
 
 // Constructor that build the Shader Program from 2 different shaders
 Shader::Shader(const char* vertexFile, const char* fragmentFile)
