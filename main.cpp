@@ -3,7 +3,7 @@
 #include <cstring>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
+#include <glm/glm/glm.hpp>
 #include "shaderClass.hpp"
 #include "window.hpp"
 #include "Cube.hpp"
@@ -11,7 +11,7 @@
 #include "VBO.hpp"
 #include "EBO.hpp"
 
-#define DISTANCE 4
+#define DISTANCE 3
 
 void matmul(GLfloat matrix[3][3], GLfloat *in, GLfloat *out)
 {
@@ -26,24 +26,25 @@ int main()
 {
 	srand(time(NULL));
 	initGlfw();
-	GLFWwindow* window = initWindow(800, 800, "cube", NULL, NULL);
+	GLFWwindow* window = initWindow(1000, 1000, "cube", NULL, NULL);
 
 	Shader shaderProgram("resources/shaders/default.vert", "resources/shaders/default.frag");
-	
-	GLfloat coord[3] = {100,100,0};
+	// glm::vec2 test(1.0f);
+	// test.x += 10.0f;
+	GLfloat coord[3] = {0,0,0};
 	Cube cube(coord, 20.0f);
-	// Cube cube2(CUBE_FRAME, coord, 1.0f);
-	// Cube cube3(CUBE_FRAME, coord, 1.0f);
+	// Cube cube2(coord, 1.0f);
+	// Cube cube3(coord, 1.0f);
 
 	float angle = 0.01f;
 	int width, height;
 	glLineWidth(5.0f);
+	glfwGetWindowSize(window, &width, &height);
+	glViewport(0, 0, width, height);
 	glPointSize(10.0f);
 	glEnable(GL_DEPTH_TEST);
 	while (!glfwWindowShouldClose(window))
 	{
-		glfwGetWindowSize(window, &width, &height);
-		glViewport(0, 0, width, height);
 		GLfloat rotateY[3][3] = {
 			{cosf(angle), 0, sinf(angle)},
 			{0, 1, 0},
@@ -60,8 +61,10 @@ int main()
 			{0, 0, 1}
 		};
 		cube.Transform(rotateY);
-		cube.Transform(rotateZ);
 		cube.Transform(rotateX);
+		cube.Transform(rotateZ);
+		// cube2.Transform(rotateZ);
+		// cube3.Transform(rotateX);
 	
 		// Specify the color of the background
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -71,9 +74,9 @@ int main()
 		shaderProgram.Activate();
 		cube.DrawMesh(DISTANCE);
 		cube.Clear();
-		// cube2.Draw(DISTANCE);
+		// cube2.DrawMesh(DISTANCE);
 		// cube2.Clear();
-		// cube3.Draw(DISTANCE);
+		// cube3.DrawMesh(DISTANCE);
 		// cube3.Clear();
 		// Bind the VAO so OpenGL knows to use it
 		// VAO1.Bind();

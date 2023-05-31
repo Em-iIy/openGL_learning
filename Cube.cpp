@@ -24,16 +24,16 @@ static GLuint mesh_indices[] = {
 	0, 6, 7				// bottom
 };
 
-static GLuint frame_indices[] = {
-	4, 5, 6, 4, // back bottom triangle
-	6, 7, 7, 5, // back top triangle
-	6, 0, // left top triangle
-	2, 4, // left bottom triangle
-	7, 1, // right bottom triangle
-	3, 5, // right top triangle
-	0, 1, 2, 0, // front bottom triangle
-	2, 3, 3, 1 // front top triangle
-};
+// static GLuint frame_indices[] = {
+// 	4, 5, 6, 4, // back bottom triangle
+// 	6, 7, 7, 5, // back top triangle
+// 	6, 0, // left top triangle
+// 	2, 4, // left bottom triangle
+// 	7, 1, // right bottom triangle
+// 	3, 5, // right top triangle
+// 	0, 1, 2, 0, // front bottom triangle
+// 	2, 3, 3, 1 // front top triangle
+// };
 
 // void Cube::loadMesh(const char *filename)
 // {
@@ -134,7 +134,7 @@ void	Cube::DrawFrame(GLfloat dist)
 	}
 	this->_VAO.Bind();
 	this->_VBO.Update(this->_draw_buffer, sizeof(base_vertices));
-	glDrawElements(GL_LINES, sizeof(frame_indices), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_LINES, sizeof(mesh_indices), GL_UNSIGNED_INT, 0);
 	this->_VAO.Unbind();
 
 }
@@ -144,6 +144,7 @@ Cube::Cube(GLfloat coords[3], GLfloat size): _size(size)
 	this->_draw_buffer = new GLfloat[sizeof(base_vertices)];
 	for (uint i = 0; i < 3; ++i)
 		this->_coords[i] = coords[i];
+	// _size = 0;
 	this->Clear();
 	this->_VAO.Bind();
 	this->_VBO = VBO(this->_draw_buffer, sizeof(base_vertices));

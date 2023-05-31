@@ -29,11 +29,11 @@ OBJS = $(FILES_OBJS:%=$(DIR_OBJS)%)
 # ----------------------------------------Flags
 CC = c++
 # CFLAGS = -std=c++98
-CFLAGS += -Wall -Wextra -Werror
+# CFLAGS += -Wall -Wextra -Werror
 # CFLAGS += -g -fsanitize=address
-# LFLAGS += -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit
-LFLAGS += -lglfw -ldl
-INC = -ILibraries/include
+LFLAGS += -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit # Apple flags
+# LFLAGS += -lglfw -ldl # Linux flags
+INC = -Iinclude
 
 # ----------------------------------------Making
 all:
