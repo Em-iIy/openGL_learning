@@ -6,7 +6,7 @@ FILES_SRCS =	main.cpp \
 				EBO.cpp \
 				VAO.cpp \
 				VBO.cpp \
-				Cube.cpp \
+				Cube_vec3.cpp \
 				glad.cpp \
 				readFile.cpp \
 				shaderClass.cpp \
@@ -30,10 +30,10 @@ OBJS = $(FILES_OBJS:%=$(DIR_OBJS)%)
 CC = c++
 # CFLAGS = -std=c++98
 # CFLAGS += -Wall -Wextra -Werror
-# CFLAGS += -g -fsanitize=address
+CFLAGS += -g -fsanitize=address
 LFLAGS += -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit # Apple flags
 # LFLAGS += -lglfw -ldl # Linux flags
-INC = -Iinc
+INC = -Iinc -Iinc/glm
 
 # ----------------------------------------Making
 all:

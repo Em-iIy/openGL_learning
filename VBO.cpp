@@ -6,6 +6,19 @@ VBO::VBO(void)
 {
 }
 // Constructor that generates a Vertex Buffer Object and links it to vertices
+VBO::VBO(std::vector<glm::vec3> &vertices)
+{
+	glGenBuffers(1, &ID);
+	glBindBuffer(GL_ARRAY_BUFFER, ID);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
+}
+
+void	VBO::Update(std::vector<glm::vec3> &vertices)
+{
+	glBindBuffer(GL_ARRAY_BUFFER, ID);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
+}
+
 VBO::VBO(GLfloat* vertices, GLsizeiptr size)
 {
 	glGenBuffers(1, &ID);
