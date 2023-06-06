@@ -29,4 +29,16 @@ T cubic_lerp(T p0, T p1, T p2, T p3, float t)
 	);
 }
 
+template <typename T>
+T cubic_lerp_derivitive1(T p0, T p1, T p2, T p3, float t)
+{
+	const float diff = 1 - t;
+
+	return (
+		3 * powf(diff, 2) * (p1 - p0) +
+		6 * diff * t * (p2 - p1) +
+		3 * powf(t, 2) * (p3 - p2)
+	);
+}
+
 #endif

@@ -32,21 +32,17 @@ int main()
 
 	Shader shaderProgram("resources/shaders/default.vert", "resources/shaders/default.frag");
 	
-	// Cube cube(glm::vec3(-0.5f, 0.3f, 0.f), 0.5f);
-	// // Cube cube2(glm::vec3(0.5f, 0.5f, 0.f), 0.5f);
-
-
-	glm::vec3 a(-0.7f, 0.5f, 0.0f);
-	glm::vec3 cont1(-0.7f, -0.5f, 0.0f);
-	glm::vec3 cont2(0.7f, -0.5f, 0.0f);
-	glm::vec3 b(0.7f, 0.5f, 0.0f);
-
-
+	glm::vec3 a(-1.f, 0.0f, .5f);
+	glm::vec3 cont1(-0.3f, -1.0f, -.5f);
+	glm::vec3 cont2(0.3f, .5f, .5f);
+	glm::vec3 b(1.0f, 0.0f, -.5f);
 
 	float angle = 0.01f;
-	uint steps = 1;
-	int step = 1;
+	int sign = 1;
 	int width, height;
+	double xPos = 0, yPos = 0;
+	std::vector<Curve> curves;
+	uint steps = 100;
 	// glLineWidth(5.f);
 	glfwGetWindowSize(window, &width, &height);
 	glViewport(0, 0, width, height);
@@ -54,39 +50,35 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	while (!glfwWindowShouldClose(window))
 	{
-		Curve curve(steps, a, cont1, cont2, b);
-		// cube.Transform(glm::rotate(glm::mat4(1.0f), angle, glm::vec3(1.f, 1.f, 0.f)));
-		// cube2.Transform(glm::rotate(glm::mat4(1.0f), angle, glm::vec3(1.f, 0.5f, 0.f)));
-		// Specify the color of the background
+		curves.clear();
+		glfwGetCursorPos(window, &xPos, &yPos);
+		xPos = toNDC(xPos, WIDTH);
+		yPos = toNDC(yPos, HEIGHT) * -1;
+		// cont1 = glm::vec3(xPos, yPos, 0.0f);
+		curves.push_back(Curve(steps, a, cont1, cont2, b));
+		float step_size = 1.f / steps;
+		for (float i = 0.f; i <= .50001f; i += step_size)
+		{
+			curves.push_back(Curve(steps, curves[0].getPos(i), cont1, cont2, curves[0].getPos(1.f - i)));
+			// curves.push_back(Curve(steps, curves[curves.size() - 1].getPos(i), cont1, cont2, curves[curves.size() - 1].getPos(1.f - i)));
+		}
 		glClearColor(0.f, 0.f, 0.f, 1.f);
-		// Clean the back buffer and assign the new color to it
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Tell OpenGL which Shader Program we want to use
 		shaderProgram.Activate();
-		curve.Draw();
-		// VAO1.Bind();
-		// glDrawElements(GL_LINES, (indc.size() - 1) * sizeof(uint), GL_UNSIGNED_INT, 0);
-		// glDrawElements(GL_POINTS, indc.size() * sizeof(uint), GL_UNSIGNED_INT, 0);
-		// VAO1.Unbind();
-		// cube.DrawMesh(DISTANCE);
-		// cube.Clear();
-		// cube2.DrawMesh(DISTANCE);
-		// cube2.Clear();
-		// Swap the back buffer with the front buffer
+		for (auto it = curves.begin(); it != curves.end(); ++it)
+			(*it).Draw();
 		glfwSwapBuffers(window);
-		// Take care of all GLFW events
 		glfwPollEvents();
-		angle += 0.01f;
-		if (steps >= 10)
-			step = -1;
-		else if (steps <= 1)
-			step = 1;
-		steps += step;
-		sleep(1);
+		angle += 0.01f * sign;
+		if (angle >= .99999f)
+			sign = -1;
+		else if (angle <= 0.00001f)
+			sign = 1;
+		for (auto it = curves.begin(); it != curves.end(); ++it)
+			(*it).Delete();
 	}
 
-	// cube.Delete();
-	// cube2.Delete();
 	shaderProgram.Delete();
 
 	glfwDestroyWindow(window);
