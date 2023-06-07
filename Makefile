@@ -11,6 +11,7 @@ FILES_SRCS =	main.cpp \
 				glad.cpp \
 				readFile.cpp \
 				shaderClass.cpp \
+				VectorClass.cpp \
 				window.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
