@@ -19,7 +19,8 @@ void	Curve::Draw(void)
 	// std::cout << _a << " " << _b << std::endl;
 	this->_VAO.Bind();
 	this->_VBO.Update(this->_draw_buffer);
-	glDrawElements(GL_LINES, (this->_indices.size() - 1) * sizeof(uint), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_LINES, this->_indices.size(), GL_UNSIGNED_INT, 0);
+	glDrawArrays(GL_POINTS, 0, this->_draw_buffer.size());
 	// glDrawElements(GL_POINTS, this->_indices.size() * sizeof(uint), GL_UNSIGNED_INT, 0);
 	this->_VAO.Unbind();
 }
@@ -42,9 +43,10 @@ Curve::Curve(uint steps, glm::vec3 a, glm::vec3 control1, glm::vec3 control2, gl
 		++idx;
 	}
 	this->_indices.pop_back();
+	this->_indices.pop_back();
 	this->_VAO.Bind();
 	this->_VBO = VBO(this->_draw_buffer);
-	this->_EBO = EBO(this->_indices.data(), (this->_indices.size() - 1) * sizeof(uint));
+	this->_EBO = EBO(this->_indices);
 	this->_VAO.LinkAtr(this->_VBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void *)0);
 	this->_VAO.Unbind();
 	this->_VBO.Unbind();

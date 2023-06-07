@@ -11,7 +11,6 @@
 #include "VBO.hpp"
 #include "EBO.hpp"
 #include "VAO.hpp"
-#include "readFile.hpp"
 
 class Curve
 {
