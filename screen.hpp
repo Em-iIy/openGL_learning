@@ -1,9 +1,9 @@
 #ifndef SCREEN_HPP
 # define SCREEN_HPP
 
-# define WIDTH 2000
-# define HEIGHT 2000
-# define DEPTH 2000
+# define WIDTH 1000
+# define HEIGHT 1000
+# define DEPTH 1000
 # define DISTANCE 1.5
 
 #include <glm/vec3.hpp>

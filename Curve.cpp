@@ -43,7 +43,7 @@ Curve::Curve(uint steps, glm::vec3 a, glm::vec3 control1, glm::vec3 control2, gl
 		++idx;
 	}
 	this->_indices.pop_back();
-	this->_indices.pop_back();
+	// this->_indices.pop_back();
 	this->_VAO.Bind();
 	this->_VBO = VBO(this->_draw_buffer);
 	this->_EBO = EBO(this->_indices);

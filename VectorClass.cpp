@@ -19,16 +19,16 @@ void	VectorClass::Clear(void)
 
 void	VectorClass::Draw(void)
 {
-	for (auto it = _indices.begin(); it != _indices.end(); ++it)
-	{
-		// if (*it == _vertices.size())
-			std::cout << *it << std::endl;
-	}
-	for (auto it = _vertices.begin(); it != _vertices.end(); ++it)
-	{
-		// if (*it == _vertices.size())
-			std::cout << *it << std::endl;
-	}
+	// for (auto it = _indices.begin(); it != _indices.end(); ++it)
+	// {
+	// 	// if (*it == _vertices.size())
+	// 		std::cout << *it << std::endl;
+	// }
+	// for (auto it = _vertices.begin(); it != _vertices.end(); ++it)
+	// {
+	// 	// if (*it == _vertices.size())
+	// 		std::cout << *it << std::endl;
+	// }
 	this->_VAO.Bind();
 	this->_VBO.Update(this->_vertices);
 	this->_EBO.Update(this->_indices);
