@@ -101,20 +101,20 @@ void	Cube::DrawMesh(GLfloat dist)
 }
 void	Cube::DrawFrame(GLfloat dist)
 {
-	std::vector<glm::vec3>::iterator it = _draw_buffer.begin();
-	std::vector<glm::vec3>::iterator ite = _draw_buffer.end();
-	while (it != ite)
-	{
-		float z = 1 / (dist - (*it).z);
+	// std::vector<glm::vec3>::iterator it = _draw_buffer.begin();
+	// std::vector<glm::vec3>::iterator ite = _draw_buffer.end();
+	// while (it != ite)
+	// {
+	// 	float z = 1 / (dist - (*it).z);
 		
-		glm::mat3 projection(
-			glm::vec3(z, 0, 0),
-			glm::vec3(0, z, 0),
-			glm::vec3(0, 0, 0)
-		);
-		*it = projection * *it;
-		++it;
-	}
+	// 	glm::mat3 projection(
+	// 		glm::vec3(z, 0, 0),
+	// 		glm::vec3(0, z, 0),
+	// 		glm::vec3(0, 0, 0)
+	// 	);
+	// 	*it = projection * *it;
+	// 	++it;
+	// }
 	this->_VAO.Bind();
 	this->_VBO.Update(this->_draw_buffer);
 	glDrawElements(GL_LINES, sizeof(mesh_indices), GL_UNSIGNED_INT, 0);

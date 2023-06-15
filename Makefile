@@ -13,6 +13,7 @@ FILES_SRCS =	main.cpp \
 				shaderClass.cpp \
 				VectorClass.cpp \
 				window.cpp \
+				stb.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
 

@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <stb/stb_image.h>
 #include "lerp.hpp"
 #include "shaderClass.hpp"
 #include "window.hpp"
@@ -18,7 +19,19 @@
 #include "Cube_vec3.hpp"
 #include <unistd.h>
 
+#include <stdio.h>
+
 int selectVect = 0;
+
+
+/*
+TO DO:
+	- Look into "Wireframe mode"
+		- glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) // enables
+		- glPolygonMode(GL_FRONT_AND_BACK, GL_FILL) // disables
+	- implement vertex struct (coords, rgb, texcoords, etc)
+	
+*/
 
 std::ostream &operator<<(std::ostream &o, glm::vec3 &v)
 {
@@ -28,7 +41,34 @@ std::ostream &operator<<(std::ostream &o, glm::vec3 &v)
 
 glm::vec3	randVec3()
 {
-	return (glm::vec3(rand() / 2147483647.0f, rand() / 2147483647.0f, rand() / 2147483647.0f));
+	return (glm::vec3((rand() / 2147483647.0f) * 2 - 1.0f, (rand() / 2147483647.0f) * 2 - 1.0f, (rand() / 2147483647.0f) * 2 - 1.0f));
+}
+
+static uint	load_tex(const char *img, int format)
+{
+	int width, height, nrChannels;
+	uint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	stbi_set_flip_vertically_on_load(true);
+	u_char *data = stbi_load(img, &width, &height, &nrChannels, 0);
+	if (!data)
+	{
+		std::cout << "load_tex: could not open: " << img << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(texture);
+	stbi_image_free(data);
+	return (texture);
+	
 }
 
 void	processInput(GLFWwindow *window)
@@ -38,10 +78,7 @@ void	processInput(GLFWwindow *window)
 	if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 	if(glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS)
-	{
 		key_minus_state = GLFW_PRESS;
-		std::cout << "- pressed " << selectVect << std::endl;
-	}
 	else if(glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_RELEASE && key_minus_state == GLFW_PRESS)
 	{
 		key_minus_state = GLFW_RELEASE;
@@ -49,6 +86,11 @@ void	processInput(GLFWwindow *window)
 			selectVect = 3;
 		else
 			--selectVect;
+		if (selectVect % 2 == 0)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		else
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 		std::cout << "- pressed " << selectVect << std::endl;
 	}
 	if(glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS)
@@ -57,6 +99,10 @@ void	processInput(GLFWwindow *window)
 	{
 		key_equal_state = GLFW_RELEASE;
 		selectVect = ++selectVect % 4;
+		if (selectVect % 2 == 0)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		else
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		std::cout << "+ pressed " << selectVect << std::endl;
 	}
 }
@@ -66,72 +112,71 @@ int main()
 	srand(time(NULL));
 	initGlfw();
 	GLFWwindow* window = initWindow(WIDTH, HEIGHT, "cube", NULL, NULL);
+	std::vector<uint> idxTriangles;
+	std::vector<Vertex> vertexTriangles;
+	vertexTriangles.push_back(Vertex{glm::vec3(0.5f, 0.5f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)});
+	vertexTriangles.push_back(Vertex{glm::vec3(0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 0.0f)});
+	vertexTriangles.push_back(Vertex{glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f)});
+	vertexTriangles.push_back(Vertex{glm::vec3(-0.5f, 0.5f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f), glm::vec2(0.0f, 1.0f)});
 
+	idxTriangles.push_back(0);
+	idxTriangles.push_back(1);
+	idxTriangles.push_back(3);
+	idxTriangles.push_back(1);
+	idxTriangles.push_back(2);
+	idxTriangles.push_back(3);
+
+	VAO	vao;
+	vao.Bind();
+	VBO vbo(vertexTriangles);
+	EBO ebo(idxTriangles);
+	vao.LinkAtr(vbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void *)0);
+	vao.LinkAtr(vbo, 1, 3, GL_FLOAT, sizeof(Vertex), (void *)(sizeof(glm::vec3)));
+	vao.LinkAtr(vbo, 2, 2, GL_FLOAT, sizeof(Vertex), (void *)(sizeof(glm::vec3) * 2));
+	vao.Unbind();
+	vbo.Unbind();
+	ebo.Unbind();
+;
 	Shader shaderProgram("resources/shaders/default.vert", "resources/shaders/default.frag");
-	
-	std::vector<glm::vec3> curveVecs;
-	glm::vec3 a(-0.5f, -0.5f, .5f);
-	curveVecs.push_back(a);
-	glm::vec3 cont1(.5f, 0.8f, .5f);
-	curveVecs.push_back(cont1);
-	glm::vec3 cont2(-.5f, 0.8f, -.5f);
-	curveVecs.push_back(cont2);
-	glm::vec3 b(.5f, -0.5f, -.5f);
-	curveVecs.push_back(b);
-	// std::cout << b << std::endl;
-	VectorClass vects;
-	Cube cube(glm::vec3(0,0,0), 0.5f);
-	float angle = 0.01f;
-	int sign = 1;
-	int width, height;
-	double xPos = 0, yPos = 0;
-	std::vector<Curve> curves;
-	uint steps = 50;
-	glLineWidth(5.f);
-	glfwGetWindowSize(window, &width, &height);
-	glViewport(0, 0, width, height);
-	glPointSize(10.f);
+
+	uint texture1, texture2;
+	texture1 = load_tex("resources/textures/container.jpg", GL_RGB);
+	texture2 = load_tex("resources/textures/awesomeface.png", GL_RGBA);
+    shaderProgram.Activate();
+    shaderProgram.setInt("texture1", 0);
+    shaderProgram.setInt("texture2", 1);
+
+	// // int uniLocMyColor = glGetUniformLocation(shaderProgram.ID, "myColor");
+	int x, y;
+	glfwGetWindowSize(window, &x, &y);
+	glViewport(0, 0, x, y);
 	glEnable(GL_DEPTH_TEST);
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
-		vects.Clear();
-		curves.clear();
-		glfwGetCursorPos(window, &xPos, &yPos);
-		xPos = toNDC(xPos, WIDTH);
-		yPos = toNDC(yPos, HEIGHT) * -1;
-		curveVecs[selectVect] = glm::vec3(xPos, yPos, 0.0f);
-		curves.push_back(Curve(steps, curveVecs[0], curveVecs[1], curveVecs[2], curveVecs[3]));
-		float step_size = 1.f / steps;
-		// for (float i = 0.f; i <= .50001f; i += step_size)
-		// {
-		// 	curves.push_back(Curve(steps, curves[0].getPos(i), curveVecs[1], curveVecs[2], curves[0].getPos(1.f - i)));
-		// 	// curves.push_back(Curve(steps, curves[curves.size() - 1].getPos(i), cont1, cont2, curves[curves.size() - 1].getPos(1.f - i)));
-		// }
+
 		glClearColor(0.f, 0.f, 0.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// Tell OpenGL which Shader Program we want to use
+
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture2);
+
 		shaderProgram.Activate();
-		vects.AddVector(curveVecs[0], curveVecs[1]);
-		vects.AddVector(curveVecs[2], curveVecs[3]);
-		vects.Draw();
-		for (auto it = curves.begin(); it != curves.end(); ++it)
-			(*it).Draw();
-		cube.setCoord(curves[0].getPos(angle));
-		cube.Transform(glm::rotate(glm::mat4(1.0f), angle * 5, glm::vec3(1.0f, 1.0f, 0.0f)));
-		cube.DrawMesh(DISTANCE);
-		cube.Clear();
+
+		vao.Bind();
+		glDrawElements(GL_TRIANGLES, idxTriangles.size(), GL_UNSIGNED_INT, 0);
+		vao.Unbind();
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-		angle += 0.01f * sign;
-		if (angle >= .99999f)
-			sign = -1;
-		else if (angle <= 0.00001f)
-			sign = 1;
-		for (auto it = curves.begin(); it != curves.end(); ++it)
-			(*it).Delete();
-
 	}
+
+	vao.Delete();
+	vbo.Delete();
+	ebo.Delete();
 	shaderProgram.Delete();
 	glfwDestroyWindow(window);
 	glfwTerminate();

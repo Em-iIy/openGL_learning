@@ -33,7 +33,7 @@ void	VectorClass::Draw(void)
 	this->_VBO.Update(this->_vertices);
 	this->_EBO.Update(this->_indices);
 	glDrawElements(GL_LINES, this->_indices.size(), GL_UNSIGNED_INT, 0);
-	glDrawArrays(GL_POINTS, 0, this->_vertices.size());
+	// glDrawArrays(GL_POINTS, 0, this->_vertices.size());
 	this->_VAO.Unbind();
 	this->_VBO.Unbind();
 	this->_EBO.Unbind();

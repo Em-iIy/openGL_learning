@@ -23,5 +23,9 @@ public:
 	void Activate();
 	// Deletes the Shader Program
 	void Delete();
+
+	void setBool(const std::string &name, bool value) const;
+	void setFloat(const std::string &name, float value) const;
+	void setInt(const std::string &name, int value) const;
 };
 #endif
