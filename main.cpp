@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <stb/stb_image.h>
 #include "lerp.hpp"
 #include "shaderClass.hpp"
@@ -36,6 +37,11 @@ TO DO:
 std::ostream &operator<<(std::ostream &o, glm::vec3 &v)
 {
 	o << "(" << v.x << ", " << v.y << ", " << v.z << ")";
+	return (o);
+}
+std::ostream &operator<<(std::ostream &o, glm::vec4 &v)
+{
+	o << "(" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")";
 	return (o);
 }
 
@@ -112,6 +118,9 @@ int main()
 	srand(time(NULL));
 	initGlfw();
 	GLFWwindow* window = initWindow(WIDTH, HEIGHT, "cube", NULL, NULL);
+
+	// trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+
 	std::vector<uint> idxTriangles;
 	std::vector<Vertex> vertexTriangles;
 	vertexTriangles.push_back(Vertex{glm::vec3(0.5f, 0.5f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)});
@@ -146,6 +155,7 @@ int main()
     shaderProgram.setInt("texture1", 0);
     shaderProgram.setInt("texture2", 1);
 
+
 	// // int uniLocMyColor = glGetUniformLocation(shaderProgram.ID, "myColor");
 	int x, y;
 	glfwGetWindowSize(window, &x, &y);
@@ -163,17 +173,24 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
-
-		shaderProgram.Activate();
-
-		vao.Bind();
-		glDrawElements(GL_TRIANGLES, idxTriangles.size(), GL_UNSIGNED_INT, 0);
-		vao.Unbind();
+		// glm::normalize(glm::vec3(1.0f, 1.0f, 1.0f))
+		for (float scale = -0.5f; scale < 0.5f; scale += 0.1f)
+		{
+			glm::mat4 trans = glm::mat4(1.0f);
+			shaderProgram.Activate();
+			trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+			trans = glm::translate(trans, glm::vec3(scale));
+			// trans = glm::rotate(trans, (float)glfwGetTime() * 2, glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f)));
+			trans = glm::scale(trans, glm::vec3(scale));
+			shaderProgram.setMat4("transform", trans);
+			vao.Bind();
+			glDrawElements(GL_TRIANGLES, idxTriangles.size(), GL_UNSIGNED_INT, 0);
+			vao.Unbind();
+		}
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-
 	vao.Delete();
 	vbo.Delete();
 	ebo.Delete();
