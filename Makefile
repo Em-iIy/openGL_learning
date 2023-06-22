@@ -12,8 +12,10 @@ FILES_SRCS =	main.cpp \
 				readFile.cpp \
 				shaderClass.cpp \
 				VectorClass.cpp \
+				Camera.cpp \
 				window.cpp \
 				stb.cpp \
+				glmPrintUtils.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
 
