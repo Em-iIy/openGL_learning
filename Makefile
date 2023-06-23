@@ -31,6 +31,9 @@ SRCS = $(FILES_SRCS:%=$(DIR_SRCS)%)
 # ----------------------------------------Objects
 OBJS = $(FILES_OBJS:%=$(DIR_OBJS)%)
 
+# ----------------------------------------Libs
+GLM = inc/glm/.git
+
 # ----------------------------------------Flags
 CC = c++
 CFLAGS = -std=c++11
@@ -44,10 +47,15 @@ INC = -Iinc -Iinc/glm
 all:
 	@$(MAKE) $(NAME) -j4
 
-$(NAME): $(DIR_OBJS) $(OBJS)
+$(NAME): $(DIR_OBJS) $(OBJS) $(GLM)
 	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(INC) $(LFLAGS)
 
-$(DIR_OBJS)%.o: %.cpp
+$(GLM):
+	@echo "fetching submodules"
+	git submodule init
+	git submodule update
+
+$(DIR_OBJS)%.o: %.cpp $(GLM)
 	$(CC) $(CFLAGS) -c $< -o $@ $(INC)
 
 $(DIR_OBJS):
