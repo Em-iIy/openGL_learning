@@ -8,6 +8,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <stb/stb_image.h>
+#include <unistd.h>
+
 #include "lerp.hpp"
 #include "shaderClass.hpp"
 #include "window.hpp"
@@ -18,12 +20,20 @@
 #include "Curve.hpp"
 #include "VectorClass.hpp"
 #include "Cube_vec3.hpp"
-#include <unistd.h>
+#include "glmPrintUtils.hpp"
+#include "Camera.hpp"
 
 #include <stdio.h>
 
 int selectVect = 0;
+float lastX = WIDTH / 2.0f;
+float lastY = HEIGHT / 2.0f;
+bool firstMouse = true;
 
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
+Camera camera;
 
 /*
 TO DO:
@@ -33,17 +43,6 @@ TO DO:
 	- implement vertex struct (coords, rgb, texcoords, etc)
 	
 */
-
-std::ostream &operator<<(std::ostream &o, glm::vec3 &v)
-{
-	o << "(" << v.x << ", " << v.y << ", " << v.z << ")";
-	return (o);
-}
-std::ostream &operator<<(std::ostream &o, glm::vec4 &v)
-{
-	o << "(" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")";
-	return (o);
-}
 
 glm::vec3	randVec3()
 {
@@ -77,8 +76,46 @@ static uint	load_tex(const char *img, int format)
 	
 }
 
+void	mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
+{
+	float xpos = static_cast<float>(xposIn);
+	float ypos = static_cast<float>(yposIn);
+
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos;
+
+	lastX = xpos;
+	lastY = ypos;
+
+	camera.processMouseMovement(xoffset, yoffset);
+}
+
+void	scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
+{
+	camera.processMouseScroll(yoffset);
+}
+
 void	processInput(GLFWwindow *window)
 {
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		camera.processKeyboard(FORWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		camera.processKeyboard(BACKWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		camera.processKeyboard(LEFT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		camera.processKeyboard(RIGHT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		camera.processKeyboard(UP, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		camera.processKeyboard(DOWN, deltaTime);
+
 	static int key_minus_state = GLFW_RELEASE;
 	static int key_equal_state = GLFW_RELEASE;
 	if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -113,27 +150,66 @@ void	processInput(GLFWwindow *window)
 	}
 }
 
+void	fill_vertices(std::vector<Vertex> &vertices)
+{
+	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f,  0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(1.0f), glm::vec2( 1.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(1.0f), glm::vec2( 1.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(1.0f), glm::vec2( 1.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(1.0f), glm::vec2(0.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(1.0f), glm::vec2(0.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f,  0.5f), glm::vec3(1.0f), glm::vec2(0.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f,  0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f,  0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 1.0f)});
+}
+
 int main()
 {
 	srand(time(NULL));
 	initGlfw();
 	GLFWwindow* window = initWindow(WIDTH, HEIGHT, "cube", NULL, NULL);
 
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetScrollCallback(window, scroll_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
 	// trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
 
 	std::vector<uint> idxTriangles;
 	std::vector<Vertex> vertexTriangles;
-	vertexTriangles.push_back(Vertex{glm::vec3(0.5f, 0.5f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)});
-	vertexTriangles.push_back(Vertex{glm::vec3(0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 0.0f)});
-	vertexTriangles.push_back(Vertex{glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f)});
-	vertexTriangles.push_back(Vertex{glm::vec3(-0.5f, 0.5f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f), glm::vec2(0.0f, 1.0f)});
+	std::vector<glm::vec3> cubePosition;
 
-	idxTriangles.push_back(0);
-	idxTriangles.push_back(1);
-	idxTriangles.push_back(3);
-	idxTriangles.push_back(1);
-	idxTriangles.push_back(2);
-	idxTriangles.push_back(3);
+	for (uint i = 0; i < 100; ++i)
+	{
+		cubePosition.push_back(randVec3() * 10.0f);
+	}
+	fill_vertices(vertexTriangles);
 
 	VAO	vao;
 	vao.Bind();
@@ -163,6 +239,10 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	while (!glfwWindowShouldClose(window))
 	{
+		float currentFrame = static_cast<float>(glfwGetTime());
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
 		processInput(window);
 
 		glClearColor(0.f, 0.f, 0.f, 1.f);
@@ -173,19 +253,24 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
-		// glm::normalize(glm::vec3(1.0f, 1.0f, 1.0f))
-		for (float scale = -0.5f; scale < 0.5f; scale += 0.1f)
+
+		shaderProgram.Activate();
+
+		glm::mat4 view = camera.getViewMatrix();
+		shaderProgram.setMat4("view", view);
+	
+		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
+		shaderProgram.setMat4("projection", projection);
+
+		vao.Bind();
+
+		for (auto i = cubePosition.begin(); i != cubePosition.end(); ++i)
 		{
-			glm::mat4 trans = glm::mat4(1.0f);
-			shaderProgram.Activate();
-			trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-			trans = glm::translate(trans, glm::vec3(scale));
-			// trans = glm::rotate(trans, (float)glfwGetTime() * 2, glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f)));
-			trans = glm::scale(trans, glm::vec3(scale));
-			shaderProgram.setMat4("transform", trans);
-			vao.Bind();
-			glDrawElements(GL_TRIANGLES, idxTriangles.size(), GL_UNSIGNED_INT, 0);
-			vao.Unbind();
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, *i);
+			model = glm::rotate(model, (float)glfwGetTime() * glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+			shaderProgram.setMat4("model", model);
+			glDrawArrays(GL_TRIANGLES, 0, vertexTriangles.size() * sizeof(Vertex));
 		}
 
 		glfwSwapBuffers(window);
