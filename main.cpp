@@ -33,16 +33,12 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-Camera camera;
 
-/*
-TO DO:
-	- Look into "Wireframe mode"
-		- glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) // enables
-		- glPolygonMode(GL_FRONT_AND_BACK, GL_FILL) // disables
-	- implement vertex struct (coords, rgb, texcoords, etc)
-	
-*/
+glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+
 
 glm::vec3	randVec3()
 {
@@ -152,42 +148,42 @@ void	processInput(GLFWwindow *window)
 
 void	fill_vertices(std::vector<Vertex> &vertices)
 {
-	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 0.0f)});
-	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 0.0f)});
-	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 1.0f)});
-	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 1.0f)});
-	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 1.0f)});
-	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 0.0f)});
-	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 0.0f)});
-	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f,  0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 0.0f)});
-	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 1.0f)});
-	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 1.0f)});
-	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 1.0f)});
-	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 0.0f)});
-	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(1.0f), glm::vec2( 1.0f, 0.0f)});
-	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(1.0f), glm::vec2( 1.0f, 1.0f)});
-	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 1.0f)});
-	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 1.0f)});
-	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 0.0f)});
-	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(1.0f), glm::vec2( 1.0f, 0.0f)});
-	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 0.0f)});
-	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 1.0f)});
-	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(1.0f), glm::vec2(0.0f, 1.0f)});
-	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(1.0f), glm::vec2(0.0f, 1.0f)});
-	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f,  0.5f), glm::vec3(1.0f), glm::vec2(0.0f, 0.0f)});
-	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 0.0f)});
-	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 1.0f)});
-	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 1.0f)});
-	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f,  0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 0.0f)});
-	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f,  0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 0.0f)});
-	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 0.0f)});
-	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 1.0f)});
-	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 1.0f)});
-	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 1.0f)});
-	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 0.0f)});
-	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(1.0f), glm::vec2(1.0f, 0.0f)});
-	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 0.0f)});
-	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(1.0f), glm::vec2( 0.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2( 0.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2( 0.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2( 0.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2( 0.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f,  0.5f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2( 0.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2( 0.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2( 1.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2( 1.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2( 0.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2( 0.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2( 0.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2( 1.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f,  0.5f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2( 0.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f,  0.5f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f,  0.5f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2( 0.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2( 0.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2( 0.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2( 0.0f, 0.0f)});
+	vertices.push_back(Vertex{glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2( 0.0f, 1.0f)});
 }
 
 int main()
@@ -203,6 +199,7 @@ int main()
 
 	std::vector<uint> idxTriangles;
 	std::vector<Vertex> vertexTriangles;
+	std::vector<Vertex> lightCube;
 	std::vector<glm::vec3> cubePosition;
 
 	for (uint i = 0; i < 100; ++i)
@@ -210,6 +207,7 @@ int main()
 		cubePosition.push_back(randVec3() * 10.0f);
 	}
 	fill_vertices(vertexTriangles);
+	fill_vertices(lightCube);
 
 	VAO	vao;
 	vao.Bind();
@@ -217,19 +215,28 @@ int main()
 	EBO ebo(idxTriangles);
 	vao.LinkAtr(vbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void *)0);
 	vao.LinkAtr(vbo, 1, 3, GL_FLOAT, sizeof(Vertex), (void *)(sizeof(glm::vec3)));
-	vao.LinkAtr(vbo, 2, 2, GL_FLOAT, sizeof(Vertex), (void *)(sizeof(glm::vec3) * 2));
+	vao.LinkAtr(vbo, 2, 3, GL_FLOAT, sizeof(Vertex), (void *)(sizeof(glm::vec3) * 2));
+	vao.LinkAtr(vbo, 3, 2, GL_FLOAT, sizeof(Vertex), (void *)(sizeof(glm::vec3) * 3));
 	vao.Unbind();
 	vbo.Unbind();
 	ebo.Unbind();
-;
-	Shader shaderProgram("resources/shaders/default.vert", "resources/shaders/default.frag");
 
-	uint texture1, texture2;
-	texture1 = load_tex("resources/textures/container.jpg", GL_RGB);
-	texture2 = load_tex("resources/textures/awesomeface.png", GL_RGBA);
-    shaderProgram.Activate();
-    shaderProgram.setInt("texture1", 0);
-    shaderProgram.setInt("texture2", 1);
+	VAO	lightVao;
+	lightVao.Bind();
+	VBO lightVbo(lightCube);
+	lightVao.LinkAtr(lightVbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void *)0);
+	lightVao.Unbind();
+	lightVbo.Unbind();
+
+
+	Shader shaderProgram("resources/shaders/light.vert", "resources/shaders/default.frag");
+	Shader lightShader("resources/shaders/light.vert", "resources/shaders/light.frag");
+	// uint texture1, texture2;
+	// texture1 = load_tex("resources/textures/container.jpg", GL_RGB);
+	// texture2 = load_tex("resources/textures/awesomeface.png", GL_RGBA);
+    // shaderProgram.Activate();
+    // shaderProgram.setInt("texture1", 0);
+    // shaderProgram.setInt("texture2", 1);
 
 
 	// // int uniLocMyColor = glGetUniformLocation(shaderProgram.ID, "myColor");
@@ -237,6 +244,7 @@ int main()
 	glfwGetWindowSize(window, &x, &y);
 	glViewport(0, 0, x, y);
 	glEnable(GL_DEPTH_TEST);
+	glm::vec3 objColor = glm::vec3(1.0f, 0.5f, 0.31f);
 	while (!glfwWindowShouldClose(window))
 	{
 		float currentFrame = static_cast<float>(glfwGetTime());
@@ -245,33 +253,48 @@ int main()
 
 		processInput(window);
 
-		glClearColor(0.f, 0.f, 0.f, 1.f);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture2);
-
-		shaderProgram.Activate();
+        // glActiveTexture(GL_TEXTURE0);
+        // glBindTexture(GL_TEXTURE_2D, texture1);
+        // glActiveTexture(GL_TEXTURE1);
+        // glBindTexture(GL_TEXTURE_2D, texture2);
 
 		glm::mat4 view = camera.getViewMatrix();
-		shaderProgram.setMat4("view", view);
-	
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
+
+		// lightPos = camera.Position - camera.Front;
+		lightColor = glm::vec3(1.0f, abs(sin(glfwGetTime())), abs(cos(glfwGetTime())));
+
+		shaderProgram.Activate();
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(sin(glfwGetTime()) * 3, 0.0f, cos(glfwGetTime()) * 3));
+		shaderProgram.setVec3("objectColor", objColor);
+		shaderProgram.setVec3("lightColor", lightColor);
+		shaderProgram.setVec3("lightPos", lightPos);
+		shaderProgram.setMat4("view", view);
 		shaderProgram.setMat4("projection", projection);
-
+		shaderProgram.setMat4("model", model);
+		std::cout << abs(sin(glfwGetTime())) << std::endl;
 		vao.Bind();
+		glDrawArrays(GL_TRIANGLES, 0, vertexTriangles.size() * sizeof(Vertex));
+		vao.Unbind();
 
-		for (auto i = cubePosition.begin(); i != cubePosition.end(); ++i)
-		{
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, *i);
-			model = glm::rotate(model, (float)glfwGetTime() * glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-			shaderProgram.setMat4("model", model);
-			glDrawArrays(GL_TRIANGLES, 0, vertexTriangles.size() * sizeof(Vertex));
-		}
+		lightShader.Activate();
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, lightPos);
+		model = glm::scale(model, glm::vec3(0.2f));
+		lightShader.setMat4("view", view);
+		lightShader.setVec3("lightColor", lightColor);
+		lightShader.setMat4("projection", projection);
+		lightShader.setMat4("model", model);
+
+		lightVao.Bind();
+		glDrawArrays(GL_TRIANGLES, 0, lightCube.size() * sizeof(Vertex));
+		lightVao.Unbind();
+
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

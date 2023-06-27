@@ -39,8 +39,8 @@ CC = c++
 CFLAGS = -std=c++11
 # CFLAGS += -Wall -Wextra -Werror
 # CFLAGS += -g -fsanitize=address
-LFLAGS += -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit # Apple flags
-# LFLAGS += -lglfw -ldl # Linux flags
+# LFLAGS += -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit # Apple flags
+LFLAGS += -lglfw -ldl # Linux flags
 INC = -Iinc -Iinc/glm
 
 # ----------------------------------------Making
@@ -51,7 +51,7 @@ $(NAME): $(DIR_OBJS) $(OBJS) $(GLM)
 	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(INC) $(LFLAGS)
 
 $(GLM):
-	@echo "fetching submodules"
+	@echo "fetching submodules..."
 	git submodule init
 	git submodule update
 
