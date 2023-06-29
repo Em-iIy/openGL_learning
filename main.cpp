@@ -37,7 +37,7 @@ float lastFrame = 0.0f;
 glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 6.0f));
 
 
 glm::vec3	randVec3()
@@ -266,18 +266,21 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
 
 		// lightPos = camera.Position - camera.Front;
-		lightColor = glm::vec3(1.0f, abs(sin(glfwGetTime())), abs(cos(glfwGetTime())));
+		// lightColor = glm::vec3(1.0f, abs(sin(glfwGetTime())), abs(cos(glfwGetTime())));
 
 		shaderProgram.Activate();
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(sin(glfwGetTime()) * 3, 0.0f, cos(glfwGetTime()) * 3));
+		model = glm::translate(model, glm::vec3(0.0f, sin(glfwGetTime()) * 15, cos(glfwGetTime()) * 15));
+		model = glm::rotate(model, (float)glfwGetTime() * glm::radians(45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(10.0f, 4.0f, 2.0f));
 		shaderProgram.setVec3("objectColor", objColor);
 		shaderProgram.setVec3("lightColor", lightColor);
 		shaderProgram.setVec3("lightPos", lightPos);
+		shaderProgram.setVec3("viewPos", camera.Position);
 		shaderProgram.setMat4("view", view);
 		shaderProgram.setMat4("projection", projection);
 		shaderProgram.setMat4("model", model);
-		std::cout << abs(sin(glfwGetTime())) << std::endl;
+	
 		vao.Bind();
 		glDrawArrays(GL_TRIANGLES, 0, vertexTriangles.size() * sizeof(Vertex));
 		vao.Unbind();
