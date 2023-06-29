@@ -107,3 +107,11 @@ void Shader::setMat4(const std::string &name, glm::mat4 &mat) const
 {
 	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
+
+void Shader::setMaterial(const std::string &name, Material &value) const
+{
+	this->setVec3(name + ".ambient", value.ambient);
+	this->setVec3(name + ".diffuse", value.diffuse);
+	this->setVec3(name + ".specular", value.specular);
+	this->setFloat(name + ".shininess", value.shininess);
+}
