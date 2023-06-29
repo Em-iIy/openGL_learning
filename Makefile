@@ -39,8 +39,14 @@ CC = c++
 CFLAGS = -std=c++11
 # CFLAGS += -Wall -Wextra -Werror
 # CFLAGS += -g -fsanitize=address
-# LFLAGS += -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit # Apple flags
-LFLAGS += -lglfw -ldl # Linux flags
+UNAME = $(shell uname)
+
+ifeq ($(UNAME), Linux)
+	LFLAGS = -lglfw -ldl # Linux flags
+endif
+ifeq ($(UNAME), Darwin)
+	LFLAGS = -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit # Apple flags
+endif
 INC = -Iinc -Iinc/glm
 
 # ----------------------------------------Making
