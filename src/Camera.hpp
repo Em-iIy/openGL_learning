@@ -6,6 +6,9 @@
 # include <glm/mat4x4.hpp>
 # include <glm/gtc/matrix_transform.hpp>
 
+# define WIDTH 1000
+# define HEIGHT 1000
+
 enum Camera_Movement {
 	FORWARD,
 	BACKWARD,
@@ -55,5 +58,7 @@ class Camera {
 		Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH);
 		~Camera();
 };
+
+extern Camera camera;
 
 #endif

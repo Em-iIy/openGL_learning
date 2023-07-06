@@ -10,7 +10,7 @@
 #include "VBO.hpp"
 #include "EBO.hpp"
 #include "VAO.hpp"
-#include "readFile.hpp"
+#include "utils/readFile.hpp"
 
 enum {
 	CUBE_FRAME,

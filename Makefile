@@ -6,16 +6,18 @@ FILES_SRCS =	main.cpp \
 				EBO.cpp \
 				VAO.cpp \
 				VBO.cpp \
-				Cube_vec3.cpp \
-				Curve.cpp \
 				glad.cpp \
 				readFile.cpp \
 				shaderClass.cpp \
-				VectorClass.cpp \
 				Camera.cpp \
 				window.cpp \
 				stb.cpp \
 				glmPrintUtils.cpp \
+				loadTex.cpp \
+				inputProcessing.cpp \
+				# Cube_vec3.cpp \
+				# Curve.cpp \
+				# VectorClass.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
 
@@ -23,7 +25,9 @@ FILES_OBJS = $(FILES_SRCS:.cpp=.o)
 DIR_SRCS = ./src/
 DIR_OBJS = ./obj/
 
-vpath %.cpp $(DIR_SRCS)
+vpath %.cpp $(DIR_SRCS) \
+			$(DIR_SRCS)utils/ \
+			$(DIR_SRCS)lib/ \
 
 # ----------------------------------------Sources
 SRCS = $(FILES_SRCS:%=$(DIR_SRCS)%)
@@ -47,7 +51,7 @@ endif
 ifeq ($(UNAME), Darwin)
 	LFLAGS = -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit # Apple flags
 endif
-INC = -Iinc -Iinc/glm
+INC =  -Iinc -Iinc/glm -Isrc
 
 # ----------------------------------------Making
 all:

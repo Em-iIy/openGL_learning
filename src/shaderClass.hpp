@@ -14,7 +14,7 @@
 #include <glm/mat3x3.hpp>
 #include <glm/mat4x4.hpp>
 
-#include "readFile.hpp"
+#include "utils/readFile.hpp"
 
 struct Material {
 	uint 		diffuse;
