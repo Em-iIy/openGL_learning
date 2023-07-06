@@ -123,7 +123,15 @@ void Shader::setMaterial(const std::string &name, Material &value) const
 void Shader::setLight(const std::string &name, Light &value) const
 {
 	this->setVec3(name + ".position", value.position);
+	this->setVec3(name + ".direction", value.direction);
+
 	this->setVec3(name + ".ambient", value.ambient);
 	this->setVec3(name + ".diffuse", value.diffuse);
 	this->setVec3(name + ".specular", value.specular);
+
+	this->setFloat(name + ".constant", value.constant);
+	this->setFloat(name + ".linear", value.linear);
+	this->setFloat(name + ".quadratic", value.quadratic);
+
+	this->setFloat(name + ".cutOff", value.cutOff);
 }

@@ -23,7 +23,20 @@
 #include <stdio.h>
 
 
-Camera camera(glm::vec3(0.0f, 0.0f, 6.0f));
+glm::vec3 cubePositions[] = {
+    glm::vec3( 0.0f,  0.0f,  0.0f),
+    glm::vec3( 2.0f,  5.0f, -15.0f),
+    glm::vec3(-1.5f, -2.2f, -2.5f),
+    glm::vec3(-3.8f, -2.0f, -12.3f),
+    glm::vec3( 2.4f, -0.4f, -3.5f),
+    glm::vec3(-1.7f,  3.0f, -7.5f),
+    glm::vec3( 1.3f, -2.0f, -2.5f),
+    glm::vec3( 1.5f,  2.0f, -2.5f),
+    glm::vec3( 1.5f,  0.2f, -1.5f),
+    glm::vec3(-1.3f,  1.0f, -1.5f)
+};
+
+Camera camera(glm::vec3(14.915f, 2.40094f, -4.04078f));
 
 glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
 
@@ -112,9 +125,17 @@ int main()
 	};
 	Light light = {
 		.position = glm::vec3(1.2f, 1.0f, 2.0f),
+		.direction = glm::vec3(0.0f, -1.0f, 0.0f),
+
 		.ambient = glm::vec3(0.2f),
 		.diffuse = glm::vec3(0.5f),
-		.specular = glm::vec3(1.0f)
+		.specular = glm::vec3(1.0f),
+
+		.constant = 1.0f,
+		.linear = 0.09f,
+		.quadratic = 0.032f,
+
+		.cutOff = glm::cos(glm::radians(12.5f))
 	};
 
 	int x, y;
@@ -133,9 +154,12 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
 
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, (float)glfwGetTime() * glm::radians(120.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(2.0f));
+		// model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+		// model = glm::rotate(model, (float)glfwGetTime() * glm::radians(120.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		// model = glm::scale(model, glm::vec3(2.0f));
+
+		light.position = camera.Position;
+		light.direction = camera.Front;
 
 		containerShader.Activate();
 		containerShader.setMaterial("material", material);
@@ -147,12 +171,21 @@ int main()
 	
 		// Draw the container
 		vao.Bind();
-		glDrawArrays(GL_TRIANGLES, 0, vertexTriangles.size() * sizeof(Vertex));
+		for(unsigned int i = 0; i < 10; i++)
+		{
+			model = glm::mat4(1.0f);
+			model = glm::translate(model, cubePositions[i]);
+			float angle = 20.0f * i;
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			containerShader.setMat4("model", model);
+
+			glDrawArrays(GL_TRIANGLES, 0, vertexTriangles.size() * sizeof(Vertex));
+		}
 		vao.Unbind();
 
 		// Create cube where the light is
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, light.position);
+		model = glm::translate(model, glm::vec3(light.position));
 		model = glm::scale(model, glm::vec3(0.2f));
 
 		// Set lightshader uniforms
@@ -164,7 +197,7 @@ int main()
 
 		// Draw light cube
 		lightVao.Bind();
-		glDrawArrays(GL_TRIANGLES, 0, vertexTriangles.size() * sizeof(Vertex));
+		// glDrawArrays(GL_TRIANGLES, 0, vertexTriangles.size() * sizeof(Vertex));
 		lightVao.Unbind();
 
 		// Swap the front and back buffers to put the new frame in the window

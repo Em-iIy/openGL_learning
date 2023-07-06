@@ -2,7 +2,8 @@
 #include <GLFW/glfw3.h>
 
 #include "inputProcessing.hpp"
-
+#include "utils/glmPrintUtils.hpp"
+#include <unistd.h>
 namespace input {
 
 float lastX = WIDTH / 2.0f;
@@ -73,6 +74,15 @@ void	processInput(GLFWwindow *window)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		else
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
+
+	static int key_q_state = GLFW_RELEASE;
+	if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+		key_q_state = GLFW_PRESS;
+	else if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_RELEASE && key_q_state == GLFW_PRESS)
+	{
+		key_q_state = GLFW_RELEASE;
+		std::cout << "Camera position: " << camera.Position << std::endl;
 	}
 }
 
