@@ -110,10 +110,14 @@ void Shader::setMat4(const std::string &name, glm::mat4 &mat) const
 
 void Shader::setMaterial(const std::string &name, Material &value) const
 {
-	this->setVec3(name + ".ambient", value.ambient);
-	this->setVec3(name + ".diffuse", value.diffuse);
-	this->setVec3(name + ".specular", value.specular);
+	this->setInt(name + ".diffuse", 0);
+	this->setInt(name + ".specular", 1);
 	this->setFloat(name + ".shininess", value.shininess);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, value.diffuse);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, value.specular);
 }
 
 void Shader::setLight(const std::string &name, Light &value) const

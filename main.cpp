@@ -237,8 +237,10 @@ int main()
     // shaderProgram.setInt("texture1", 0);
     // shaderProgram.setInt("texture2", 1);
 
+	uint diffuseMap, specMap;
+	diffuseMap = load_tex("resources/textures/steel_container.png", GL_RGBA);
+	specMap = load_tex("resources/textures/container2_specular.png", GL_RGBA);
 
-	// // int uniLocMyColor = glGetUniformLocation(shaderProgram.ID, "myColor");
 	int x, y;
 	glfwGetWindowSize(window, &x, &y);
 	glViewport(0, 0, x, y);
@@ -267,9 +269,8 @@ int main()
 		// lightPos = camera.Position - camera.Front;
 		// lightColor = glm::vec3(1.0f, abs(sin(glfwGetTime())), abs(cos(glfwGetTime())));
 		Material material;
-		material.ambient = glm::vec3(1.0f, 0.5f, 0.31f);
-		material.diffuse = glm::vec3(1.0f, 0.5f, 0.31f) * 0.2f;
-		material.specular = glm::vec3(0.5f);
+		material.diffuse = diffuseMap;
+		material.specular = specMap;
 		material.shininess = 32.0f;
 		Light light = {
 			.position = glm::vec3(1.2f, 1.0f, 2.0f),
@@ -281,7 +282,7 @@ int main()
 		glm::mat4 model = glm::mat4(1.0f);
 		// model = glm::translate(model, glm::vec3(0.0f, sin(glfwGetTime()) * 5, cos(glfwGetTime()) * 5));
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-		// model = glm::rotate(model, (float)glfwGetTime() * glm::radians(120.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, (float)glfwGetTime() * glm::radians(120.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		// model = glm::scale(model, glm::vec3(1.0f, 2.0f, 1.0f));
 		shaderProgram.setMaterial("material", material);
 		shaderProgram.setLight("light", light);
