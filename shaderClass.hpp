@@ -23,6 +23,13 @@ struct Material {
 	float shininess;
 };
 
+struct Light {
+	glm::vec3 position;
+	glm::vec3 ambient;
+	glm::vec3 diffuse;
+	glm::vec3 specular;
+};
+
 class Shader
 {
 public:
@@ -46,5 +53,6 @@ public:
 	void setMat3(const std::string &name, glm::mat3 &value) const;
 	void setMat4(const std::string &name, glm::mat4 &value) const;
 	void setMaterial(const std::string &name, Material &value) const;
+	void setLight(const std::string &name, Light &value) const;
 };
 #endif

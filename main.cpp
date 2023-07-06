@@ -33,9 +33,8 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-
 glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+// glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 Camera camera(glm::vec3(0.0f, 0.0f, 6.0f));
 
@@ -272,6 +271,12 @@ int main()
 		material.diffuse = glm::vec3(1.0f, 0.5f, 0.31f) * 0.2f;
 		material.specular = glm::vec3(0.5f);
 		material.shininess = 32.0f;
+		Light light = {
+			.position = glm::vec3(1.2f, 1.0f, 2.0f),
+			.ambient = glm::vec3(0.2f),
+			.diffuse = glm::vec3(0.5f),
+			.specular = glm::vec3(1.0f)
+		};
 		shaderProgram.Activate();
 		glm::mat4 model = glm::mat4(1.0f);
 		// model = glm::translate(model, glm::vec3(0.0f, sin(glfwGetTime()) * 5, cos(glfwGetTime()) * 5));
@@ -279,10 +284,10 @@ int main()
 		// model = glm::rotate(model, (float)glfwGetTime() * glm::radians(120.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		// model = glm::scale(model, glm::vec3(1.0f, 2.0f, 1.0f));
 		shaderProgram.setMaterial("material", material);
+		shaderProgram.setLight("light", light);
 		shaderProgram.setVec3("objectColor", objColor);
-		shaderProgram.setVec3("objectColor", objColor);
-		shaderProgram.setVec3("lightColor", lightColor);
-		shaderProgram.setVec3("lightPos", lightPos);
+		// shaderProgram.setVec3("lightColor", lightColor);
+		// shaderProgram.setVec3("lightPos", lightPos);
 		shaderProgram.setVec3("viewPos", camera.Position);
 		shaderProgram.setMat4("view", view);
 		shaderProgram.setMat4("projection", projection);
@@ -294,7 +299,7 @@ int main()
 
 		lightShader.Activate();
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, lightPos);
+		model = glm::translate(model, light.position);
 		model = glm::scale(model, glm::vec3(0.2f));
 		lightShader.setMat4("view", view);
 		lightShader.setVec3("lightColor", lightColor);
