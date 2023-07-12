@@ -134,4 +134,42 @@ void Shader::setLight(const std::string &name, Light &value) const
 	this->setFloat(name + ".quadratic", value.quadratic);
 
 	this->setFloat(name + ".cutOff", value.cutOff);
+	this->setFloat(name + ".outerCutOff", value.outerCutOff);
 }
+
+
+void Shader::setDirLight(const std::string &name, DirLight &value) const
+{
+	this->setVec3(name + ".direction", value.direction);
+
+	this->setVec3(name + ".ambient", value.ambient);
+	this->setVec3(name + ".diffuse", value.diffuse);
+	this->setVec3(name + ".specular", value.specular);
+}
+
+void Shader::setPointLight(const std::string &name, PointLight &value) const
+{
+	this->setVec3(name + ".position", value.position);
+
+	this->setVec3(name + ".ambient", value.ambient);
+	this->setVec3(name + ".diffuse", value.diffuse);
+	this->setVec3(name + ".specular", value.specular);
+
+	this->setFloat(name + ".constant", value.constant);
+	this->setFloat(name + ".linear", value.linear);
+	this->setFloat(name + ".quadratic", value.quadratic);
+}
+
+void Shader::setSpotLight(const std::string &name, SpotLight &value) const
+{
+	this->setVec3(name + ".direction", value.direction);
+	this->setVec3(name + ".position", value.position);
+
+	this->setVec3(name + ".ambient", value.ambient);
+	this->setVec3(name + ".diffuse", value.diffuse);
+	this->setVec3(name + ".specular", value.specular);
+	
+	this->setFloat(name + ".cutOff", value.cutOff);
+	this->setFloat(name + ".outerCutOff", value.outerCutOff);
+}
+

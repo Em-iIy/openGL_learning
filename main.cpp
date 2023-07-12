@@ -36,6 +36,13 @@ glm::vec3 cubePositions[] = {
     glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
+glm::vec3 pointLightPositions[] = {
+	glm::vec3( 0.7f,  0.2f,  2.0f),
+	glm::vec3( 2.3f, -3.3f, -4.0f),
+	glm::vec3(-4.0f,  2.0f, -12.0f),
+	glm::vec3( 0.0f,  0.0f, -3.0f)
+};
+
 Camera camera(glm::vec3(14.915f, 2.40094f, -4.04078f));
 
 glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -123,21 +130,21 @@ int main()
 		.specular = loadTex("resources/textures/container2_specular.png", GL_RGBA),
 		.shininess = 32.0f
 	};
-	Light light = {
-		.position = glm::vec3(1.2f, 1.0f, 2.0f),
-		.direction = glm::vec3(0.0f, -1.0f, 0.0f),
+	PointLight pLights[4];
 
-		.ambient = glm::vec3(0.2f),
-		.diffuse = glm::vec3(0.5f),
-		.specular = glm::vec3(1.0f),
+	for (uint i = 0; i < 4; ++i)
+	{
+		pLights[i] = PointLight{
+			.position = pointLightPositions[i],
+			.ambient = glm::vec3(0.2f),
+			.diffuse = glm::vec3(0.5f),
+			.specular = glm::vec3(1.0f),
 
-		.constant = 1.0f,
-		.linear = 0.09f,
-		.quadratic = 0.032f,
-
-		.cutOff = glm::cos(glm::radians(12.5f))
-	};
-
+			.constant = 1.0f,
+			.linear = 0.09f,
+			.quadratic = 0.032f
+		};
+	}
 	int x, y;
 	glfwGetWindowSize(window, &x, &y);
 	glViewport(0, 0, x, y);
@@ -158,16 +165,16 @@ int main()
 		// model = glm::rotate(model, (float)glfwGetTime() * glm::radians(120.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		// model = glm::scale(model, glm::vec3(2.0f));
 
-		light.position = camera.Position;
-		light.direction = camera.Front;
-
 		containerShader.Activate();
 		containerShader.setMaterial("material", material);
-		containerShader.setLight("light", light);
 		containerShader.setVec3("viewPos", camera.Position);
 		containerShader.setMat4("view", view);
 		containerShader.setMat4("projection", projection);
 		containerShader.setMat4("model", model);
+		containerShader.setPointLight("pointLights[0]", pLights[0]);
+		containerShader.setPointLight("pointLights[1]", pLights[1]);
+		containerShader.setPointLight("pointLights[2]", pLights[2]);
+		containerShader.setPointLight("pointLights[3]", pLights[3]);
 	
 		// Draw the container
 		vao.Bind();
@@ -183,21 +190,22 @@ int main()
 		}
 		vao.Unbind();
 
-		// Create cube where the light is
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(light.position));
-		model = glm::scale(model, glm::vec3(0.2f));
-
 		// Set lightshader uniforms
 		lightShader.Activate();
 		lightShader.setMat4("view", view);
 		lightShader.setMat4("projection", projection);
-		lightShader.setMat4("model", model);
 		lightShader.setVec3("lightColor", lightColor);
 
 		// Draw light cube
 		lightVao.Bind();
-		// glDrawArrays(GL_TRIANGLES, 0, vertexTriangles.size() * sizeof(Vertex));
+		for (uint i = 0; i < 4; i++)
+		{
+			model = glm::mat4(1.0f);
+			model = glm::translate(model, pointLightPositions[i]);
+			model = glm::scale(model, glm::vec3(0.2f));
+			lightShader.setMat4("model", model);
+			glDrawArrays(GL_TRIANGLES, 0, vertexTriangles.size() * sizeof(Vertex));
+		}
 		lightVao.Unbind();
 
 		// Swap the front and back buffers to put the new frame in the window

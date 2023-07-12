@@ -22,6 +22,38 @@ struct Material {
 	float		shininess;
 };
 
+struct DirLight {
+   glm::vec3 direction;
+
+   glm::vec3 ambient;
+   glm::vec3 diffuse;
+   glm::vec3 specular;
+};
+
+struct PointLight {
+   glm::vec3 position;
+   
+   glm::vec3 ambient;
+   glm::vec3 diffuse;
+   glm::vec3 specular;
+
+   float constant;
+   float linear;
+   float quadratic;
+};
+
+struct SpotLight {
+   glm::vec3 position;
+   glm::vec3 direction;
+
+   glm::vec3 ambient;
+   glm::vec3 diffuse;
+   glm::vec3 specular;
+
+   float cutOff;
+   float outerCutOff;
+};
+
 struct Light {
 	glm::vec3 position;
 	glm::vec3 direction;
@@ -35,6 +67,7 @@ struct Light {
 	float quadratic;
 
 	float cutOff;
+	float outerCutOff;
 };
 
 class Shader
@@ -61,5 +94,8 @@ public:
 	void setMat4(const std::string &name, glm::mat4 &value) const;
 	void setMaterial(const std::string &name, Material &value) const;
 	void setLight(const std::string &name, Light &value) const;
+	void setDirLight(const std::string &name, DirLight &value) const;
+	void setPointLight(const std::string &name, PointLight &value) const;
+	void setSpotLight(const std::string &name, SpotLight &value) const;
 };
 #endif
