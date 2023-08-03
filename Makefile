@@ -41,9 +41,6 @@ GLM_SM = inc/glm/.git
 ASSIMP = $(DIR_ASSIMP)bin/libassimp.5.2.5.dylib
 ASSIMP_SM = $(DIR_ASSIMP).git
 
-SUBMODULES =	$(GLM_SM) \
-				$(ASSIMP_SM) \
-
 
 # ----------------------------------------Flags
 CC = c++
@@ -64,15 +61,12 @@ INC =  -Iinc -Iinc/glm -Isrc
 all:
 	@$(MAKE) $(NAME) -j4
 
-$(NAME): $(DIR_OBJS) $(OBJS) $(SUBMODULES) $(ASSIMP)
+
+$(NAME): $(DIR_OBJS) $(OBJS) $(SUBMODULES) $(GLM_SM) $(ASSIMP)
 	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(INC) $(LFLAGS) $(ASSIMP)
 
-$(SUBMODULES):
-	@echo "fetching submodules..."
-	git submodule init
-	git submodule update
 
-$(ASSIMP):
+$(ASSIMP): $(ASSIMP_SM)
 	cmake $(DIR_ASSIMP)CMakeLists.txt -B $(DIR_ASSIMP)
 	make -C $(DIR_ASSIMP)
 
@@ -83,6 +77,14 @@ $(DIR_OBJS)%.o: %.cpp $(GLM)
 $(DIR_OBJS):
 	mkdir -p $@
 
+$(ASSIMP_SM): submodule
+$(GLM_SM): submodule
+
+submodule:
+	@echo "fetching submodules..."
+	git submodule init
+	git submodule update
+
 # ----------------------------------------Cleaning
 clean:
 	rm -f $(OBJS)
@@ -92,4 +94,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re submodule
