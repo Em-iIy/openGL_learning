@@ -22,6 +22,7 @@
 #include "inputProcessing.hpp"
 #include <stdio.h>
 
+extern float deltaTime;
 
 glm::vec3 cubePositions[] = {
     glm::vec3( 0.0f,  0.0f,  0.0f),
@@ -36,12 +37,6 @@ glm::vec3 cubePositions[] = {
     glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
-glm::vec3 pointLightPositions[] = {
-	glm::vec3( 0.7f,  0.2f,  2.0f),
-	glm::vec3( 2.3f, -3.3f, -4.0f),
-	glm::vec3(-4.0f,  2.0f, -12.0f),
-	glm::vec3( 0.0f,  0.0f, -3.0f)
-};
 
 Camera camera(glm::vec3(14.915f, 2.40094f, -4.04078f));
 
@@ -54,6 +49,7 @@ glm::vec3	randVec3()
 
 void	fill_vertices(std::vector<Vertex> &vertices)
 {
+	vertices.reserve(36);
 	vertices.push_back(Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2( 0.0f, 0.0f)});
 	vertices.push_back(Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)});
 	vertices.push_back(Vertex{glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f)});
@@ -105,6 +101,13 @@ int main()
 	std::vector<Vertex> vertexTriangles;
 	fill_vertices(vertexTriangles);
 
+	glm::vec3 pointLightPositions[] = {
+		randVec3() * 5.0f,
+		randVec3() * 5.0f,
+		randVec3() * 5.0f,
+		randVec3() * 5.0f
+	};
+
 	VAO	vao;
 	vao.Bind();
 	VBO vbo(vertexTriangles);
@@ -136,8 +139,8 @@ int main()
 	{
 		pLights[i] = PointLight{
 			.position = pointLightPositions[i],
-			.ambient = glm::vec3(0.2f),
-			.diffuse = glm::vec3(0.5f),
+			.ambient = glm::vec3(0.2f, 0.2f, 0.0f),
+			.diffuse = glm::vec3(0.5f, 0.5f, 0.0f),
 			.specular = glm::vec3(1.0f),
 
 			.constant = 1.0f,
@@ -164,7 +167,6 @@ int main()
 		// model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 		// model = glm::rotate(model, (float)glfwGetTime() * glm::radians(120.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		// model = glm::scale(model, glm::vec3(2.0f));
-
 		containerShader.Activate();
 		containerShader.setMaterial("material", material);
 		containerShader.setVec3("viewPos", camera.Position);
@@ -194,15 +196,15 @@ int main()
 		lightShader.Activate();
 		lightShader.setMat4("view", view);
 		lightShader.setMat4("projection", projection);
-		lightShader.setVec3("lightColor", lightColor);
 
 		// Draw light cube
 		lightVao.Bind();
 		for (uint i = 0; i < 4; i++)
 		{
 			model = glm::mat4(1.0f);
-			model = glm::translate(model, pointLightPositions[i]);
+			model = glm::translate(model, pLights[i].position);
 			model = glm::scale(model, glm::vec3(0.2f));
+			lightShader.setVec3("lightColor", pLights[i].diffuse);
 			lightShader.setMat4("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, vertexTriangles.size() * sizeof(Vertex));
 		}

@@ -21,6 +21,7 @@ void deltaTimeUpdate(void)
 
 void	mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
 {
+	(void)window;
 	float xpos = static_cast<float>(xposIn);
 	float ypos = static_cast<float>(yposIn);
 
@@ -41,6 +42,8 @@ void	mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
 
 void	scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 {
+	(void)window;
+	(void)xoffset;
 	camera.processMouseScroll(yoffset);
 }
 
