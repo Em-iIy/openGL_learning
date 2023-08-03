@@ -58,17 +58,17 @@ endif
 INC =  -Iinc -Iinc/glm -Isrc
 
 # ----------------------------------------Making
-all:
+all: $(GLM_SM) $(ASSIMP)
 	@$(MAKE) $(NAME) -j4
 
 
-$(NAME): $(DIR_OBJS) $(OBJS) $(SUBMODULES) $(GLM_SM) $(ASSIMP)
+$(NAME): $(DIR_OBJS) $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(INC) $(LFLAGS) $(ASSIMP)
 
 
 $(ASSIMP): $(ASSIMP_SM)
 	cmake $(DIR_ASSIMP)CMakeLists.txt -B $(DIR_ASSIMP)
-	make -C $(DIR_ASSIMP)
+	# make -j4 -C $(DIR_ASSIMP)
 
 
 $(DIR_OBJS)%.o: %.cpp $(GLM)
