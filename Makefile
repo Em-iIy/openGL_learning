@@ -68,7 +68,7 @@ $(NAME): $(DIR_OBJS) $(OBJS)
 
 $(ASSIMP): $(ASSIMP_SM)
 	cmake $(DIR_ASSIMP)CMakeLists.txt -B $(DIR_ASSIMP)
-	# make -j4 -C $(DIR_ASSIMP)
+	make -j4 -C $(DIR_ASSIMP)
 
 
 $(DIR_OBJS)%.o: %.cpp $(GLM)
@@ -77,8 +77,10 @@ $(DIR_OBJS)%.o: %.cpp $(GLM)
 $(DIR_OBJS):
 	mkdir -p $@
 
-$(ASSIMP_SM): submodule
-$(GLM_SM): submodule
+$(ASSIMP_SM): 
+	@$(MAKE) submodule
+$(GLM_SM): 
+	@$(MAKE) submodule
 
 submodule:
 	@echo "fetching submodules..."
