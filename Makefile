@@ -38,7 +38,7 @@ OBJS = $(FILES_OBJS:%=$(DIR_OBJS)%)
 
 # ----------------------------------------Libs
 GLM_SM = inc/glm/.git
-ASSIMP = $(DIR_ASSIMP)bin/libassimp.5.2.5.dylib
+ASSIMP = $(DIR_ASSIMP)bin
 ASSIMP_SM = $(DIR_ASSIMP).git
 
 
@@ -49,11 +49,13 @@ CFLAGS += -Wall -Wextra -Werror
 # CFLAGS += -g -fsanitize=address
 UNAME = $(shell uname)
 
+ASSIMP_FLAGS = -L$(ASSIMP) -lassimp -Wl,-rpath=$(ASSIMP)
+
 ifeq ($(UNAME), Linux)
-	LFLAGS = -lglfw -ldl # Linux flags
+	LFLAGS = -lglfw -ldl $(ASSIMP_FLAGS) # Linux flags
 endif
 ifeq ($(UNAME), Darwin)
-	LFLAGS = -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit # Apple flags
+	LFLAGS = -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit $(ASSIMP_FLAGS) # Apple flags
 endif
 INC =  -Iinc -Iinc/glm -Isrc
 
@@ -63,10 +65,10 @@ all: $(GLM_SM) $(ASSIMP)
 
 
 $(NAME): $(DIR_OBJS) $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(INC) $(LFLAGS) $(ASSIMP)
+	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(INC) $(LFLAGS)
 
 
-$(ASSIMP): $(ASSIMP_SM)
+$(ASSIMP): $(ASSIMP_SM) 
 	cmake $(DIR_ASSIMP)CMakeLists.txt -B $(DIR_ASSIMP)
 	make -j4 -C $(DIR_ASSIMP)
 
